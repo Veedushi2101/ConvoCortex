@@ -2,11 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { use, useState } from "react";
+import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 export default function Home() {
   const { data: session } = authClient.useSession();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,6 +72,7 @@ export default function Home() {
         onChange={(e) => setPassword(e.target.value)}
       />
       <Button onClick={onSubmit}>Register</Button>
+      
       <div className=" flex flex-col gap-y-4">
       <Input
         placeholder="email"
