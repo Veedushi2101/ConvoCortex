@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 export const HomeView = () => {
-  const { data: session } = authClient.useSession();
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   if (!session) {
     return <p>Loading...</p>;

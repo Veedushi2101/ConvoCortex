@@ -1,6 +1,6 @@
 "use client";
 
-import { refine, z } from "zod";
+import { refine, set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
@@ -10,9 +10,10 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Loader2, OctagonAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import {FaGoogle, FaGithub} from "react-icons/fa";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -48,11 +49,32 @@ export const SignUpViews = () => {
         name: data.name,
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
           setLoading(false);
           router.push("/");
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          setError(error.message);
+        }
+      });
+  };
+
+  const onSocials = (provider: "google" | "github") => {
+    setError(null);
+    setLoading(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setLoading(false);
         },
         onError: ({ error }) => {
           setLoading(false);
@@ -193,18 +215,27 @@ export const SignUpViews = () => {
                 <div className="grid grid-cols-2 gap-4 ">
                   <Button
                   disabled={loading}
+                  onClick={() =>{
+                    onSocials("google");
+                  }}
                   variant="outline"
                   type="button"
                   className="w-full hover:cursor-pointer"
                   >
+                    <FaGoogle/>
                     Google
                   </Button>
                   <Button
                   disabled={loading}
+                  onClick={() =>{
+                    setError(null);
+                    onSocials("github");
+                  }}
                   variant="outline"
                   type="button"
                   className="w-full hover:cursor-pointer"
                   >
+                    <FaGithub/>
                     GitHub
                   </Button>
                 </div>
