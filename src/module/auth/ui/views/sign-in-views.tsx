@@ -10,9 +10,10 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Loader2, OctagonAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import {FaGoogle, FaGithub} from "react-icons/fa";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -40,11 +41,32 @@ export const SignInViews = () => {
       {
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
           setLoading(false);
           router.push("/");
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          setError(error.message);
+        }
+      });
+  };
+
+    const onSocials = (provider: "google" | "github") => {
+    setError(null);
+    setLoading(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setLoading(false);
         },
         onError: ({ error }) => {
           setLoading(false);
@@ -59,7 +81,7 @@ export const SignInViews = () => {
         <CardContent className="grid p-0 md:grid-cols-2">
 
           <Form {...form}>
-            <form action="" className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
+            <form action="" className="p-6 md:p-8 bg-[#ffffff]" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
                   <h1 className="text-2xl font-bold">
@@ -143,18 +165,26 @@ export const SignInViews = () => {
                 <div className="grid grid-cols-2 gap-4 ">
                   <Button
                   disabled={loading}
+                  onClick={() =>{
+                    onSocials("google");
+                  }}
                   variant="outline"
                   type="button"
                   className="w-full hover:cursor-pointer"
                   >
+                    <FaGoogle/>
                     Google
                   </Button>
                   <Button
                   disabled={loading}
+                  onClick={() =>{
+                    onSocials("github");
+                  }}
                   variant="outline"
                   type="button"
                   className="w-full hover:cursor-pointer"
                   >
+                    <FaGithub/>
                     GitHub
                   </Button>
                 </div>
@@ -166,7 +196,7 @@ export const SignInViews = () => {
             </form>
           </Form>
 
-          <div className="bg-radial from-green-700 to-green-900 relative hidden md:flex flex-col gap-y-4 items-center justify-center">
+          <div className="bg-radial from-[#EDE0C8] to-[#4A3C2B] via-[#1A1A1] relative hidden md:flex flex-col gap-y-4 items-center justify-center">
             <img src="/next.svg" alt="Image" className="h-[92px] w-[92px]" />
             <p className="text-2xl font-semibold text-white">Convo-Cortex</p>
           </div>
