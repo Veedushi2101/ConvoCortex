@@ -196,13 +196,13 @@ export const SignInViews = () => {
             </form>
           </Form>
 
-          <div className="bg-radial from-[#EDE0C8] to-[#4A3C2B] via-[#1A1A1] relative hidden md:flex flex-col gap-y-4 items-center justify-center">
+          <div className="bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col gap-y-4 items-center justify-center">
             <img src="/next.svg" alt="Image" className="h-[92px] w-[92px]" />
             <p className="text-2xl font-semibold text-white">Convo-Cortex</p>
           </div>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance
+      <div className="text-white *:[a]:hover:text-primary text-center text-xs text-balance
       *:[a]:underline *:[a]:underline-offset-4">
         By signing in, you agree to our {" "}
         <a href="/terms-of-service" target="_blank" rel="noreferrer">
