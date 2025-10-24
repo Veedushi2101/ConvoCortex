@@ -253,7 +253,7 @@ export const SignUpViews = () => {
           </div>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance
+      <div className="text-white *:[a]:hover:text-primary text-center text-xs text-balance
       *:[a]:underline *:[a]:underline-offset-4">
         By signing in, you agree to our {" "}
         <a href="/terms-of-service" target="_blank" rel="noreferrer">
