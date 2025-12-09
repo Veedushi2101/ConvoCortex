@@ -28,6 +28,17 @@ export const AgentForm = ({onSuccess, onCancel, initialValues}: AgentFormProps) 
     const createAgent = useMutation( trpc.agents.create.mutationOptions({
         onSuccess: async() =>{
            await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
+            onSuccess?.();
+        },
+        onError: (error) =>{
+            toast.error(error.message);
+        },
+    }) 
+    ); 
+
+    const updateAgent = useMutation( trpc.agents.update.mutationOptions({
+        onSuccess: async() =>{
+           await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
             if(initialValues?.id){
                 await queryClient.invalidateQueries(trpc.agents.getOne.queryOptions({id: initialValues.id}));
             }
@@ -38,20 +49,21 @@ export const AgentForm = ({onSuccess, onCancel, initialValues}: AgentFormProps) 
         },
     }) 
     ); 
+
     const form = useForm<z.infer<typeof AgentCreateSchema>>({
         resolver: zodResolver(AgentCreateSchema),
         defaultValues: {
             name: initialValues?.name ??"",
-            instruction: initialValues?.instructions ??"",
+            instructions: initialValues?.instructions ??"",
         }
     });
 
     const isEdit = !!initialValues?.id;
-    const isPending = createAgent.isPending;
+    const isPending = createAgent.isPending || updateAgent.isPending;
 
     const onSubmit = async (data: z.infer<typeof AgentCreateSchema>) =>{
         if(isEdit){
-            console.log("Edit agent not implemented yet");
+            updateAgent.mutate({ ...data, id:initialValues.id})
         }
         else{
             createAgent.mutate(data);
@@ -72,7 +84,7 @@ export const AgentForm = ({onSuccess, onCancel, initialValues}: AgentFormProps) 
                     </FormItem>
                 )} />
         
-                <FormField name="instruction" control={form.control} render={({ field }) => (
+                <FormField name="instructions" control={form.control} render={({ field }) => (
                     <FormItem>
                         <FormLabel>Instruction</FormLabel>
                         <FormControl>

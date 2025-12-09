@@ -5,9 +5,45 @@ import { agents } from "@/db/schema";
 import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { AGENT_PAGE, AGENTS_PAGE_SIZE, MAX_PAGE_SIZE, MIN_PAGE_SIZE } from "@/constants";
-import { AgentCreateSchema } from "../schemas";
+import { AgentCreateSchema, AgentUpdateSchema } from "../schemas";
 
 export const agentRouter = createTRPCRouter({
+
+    update: protectedProcedure.input(AgentUpdateSchema).mutation(async ({ input, ctx }) => {
+        const [updatedAgent] = await db
+        .update(agents)
+        .set(input)
+        .where(and(
+            eq(agents.id, input.id),
+            eq(agents.userId, ctx.auth.user.id),
+        ))
+        .returning();
+        if (!updatedAgent) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `Agent with id ${input.id} not found.`,
+            });
+        }
+        return updatedAgent;
+    }),
+
+    remove: protectedProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
+        const [removedAgent] = await db
+        .delete(agents)
+        .where(and(
+            eq(agents.id, input.id),
+            eq(agents.userId, ctx.auth.user.id),
+        ))
+        .returning();
+
+        if (!removedAgent) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `Agent with id ${input.id} not found.`,
+            });
+        }
+        return removedAgent;
+    }),
     getOne: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
         const [existingAgent] = await db
         .select({
@@ -69,10 +105,10 @@ export const agentRouter = createTRPCRouter({
 
     create: protectedProcedure.input(AgentCreateSchema)
     .mutation(async({input, ctx}) =>{
-        const {name, instruction} = input;
+        const {name, instructions} = input;
         const [createdAgent] = await db.insert(agents).values({
             ...input,
-            instructions: instruction,
+            instructions: instructions,
             userId: ctx.auth.user.id,
         })
         .returning();
