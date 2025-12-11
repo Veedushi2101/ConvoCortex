@@ -1,0 +1,28 @@
+"use client"
+
+import { ErrorState } from "@/components/error-state";
+import { LoadingState } from "@/components/loading-state";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+
+export const MeetingsView = () => {
+    const trpc = useTRPC();
+    const {data} = useQuery(trpc.meetings.getMany.queryOptions({}))
+    return(
+        <div>
+            {JSON.stringify(data)}
+        </div>
+    )
+}
+
+export const MeetingsViewLoading = () => {
+    return (
+        <LoadingState title="Loading Agents" description="Please wait while we load the agents." />
+    )
+}
+
+export const MeetingsViewError = () => {
+    return (
+        <ErrorState title="Error Loading Agents" description="There was an issue loading the agents. Please try again later." />
+    )
+}
