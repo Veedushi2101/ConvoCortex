@@ -1,16 +1,20 @@
 import { z } from "zod";
 import { toast } from "sonner";
 import { useTRPC } from "@/trpc/client";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 // import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MeetingsOne } from "../../types";
 import { meetingsCreateSchema } from "../../schemas";
+import { CommandSelect } from "@/components/ui/command-select";
+import { GeneratedAvatar } from "@/components/generated-avatar";
+import { AgentDialogue } from "@/module/agents/ui/components/agent-dialogue";
 
 interface MeetingFormProps{
     onSuccess?: (id?: string) => void;
@@ -22,6 +26,14 @@ export const MeetingForm = ({onSuccess, onCancel, initialValues}: MeetingFormPro
     const trpc = useTRPC();
     // const router = useRouter();
     const queryClient = useQueryClient();
+
+    const [openAgentDialogue, setOpenAgentDialogue] = useState(false);
+    const [agentSearch, setAgentSearch] = useState("");
+
+    const agents = useQuery(trpc.agents.getMany.queryOptions({
+        pagesize: 100,
+        search: agentSearch
+    }));
 
     const createMeeting = useMutation( trpc.meetings.create.mutationOptions({
         onSuccess: async(data) =>{
@@ -69,14 +81,54 @@ export const MeetingForm = ({onSuccess, onCancel, initialValues}: MeetingFormPro
     }
 
     return(
+        <>
+        <AgentDialogue open={openAgentDialogue} onOpenChange={setOpenAgentDialogue} />
         <Form {...form}>
             <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField name="name" control={form.control} render={({ field }) => (
                     <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                            <Input {...field} placeholder="Enter agent name: ChatBot"/>
+                            <Input {...field} placeholder="Create your new meeting here"/>
                         </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
+                <FormField name="agentId" control={form.control} render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Agent</FormLabel>
+                        <FormControl>
+                            <CommandSelect options={(agents.data?.items ?? [])
+                                .map((agents) => ({
+                                    id:agents.id,
+                                    value: agents.id,
+                                    children: (
+                                        <div className="flex items-center gap-x-2">
+                                            <GeneratedAvatar 
+                                            seed={agents.name}
+                                            variant="botttsNeutral"
+                                            className="border size-6"
+                                            />
+                                            <span>{agents.name}</span>
+                                        </div>
+                                    )
+                                }))
+                                } 
+                                onSelect={field.onChange}
+                                onSearch={setAgentSearch}
+                                value={field.value}
+                                placeholder="Select your agent"
+                                />
+                        </FormControl>
+                        <FormDescription>
+                            Not Agent! Lets create a new Agent {"   "}
+                            <button type="button" className="text-primary hover:underline"
+                            onClick={() => setOpenAgentDialogue(true)}
+                            >
+                                Create a new Agent 
+                            </button>
+                        </FormDescription>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -94,5 +146,6 @@ export const MeetingForm = ({onSuccess, onCancel, initialValues}: MeetingFormPro
                 </div>
             </form>
         </Form>
+        </>
     )
 }
