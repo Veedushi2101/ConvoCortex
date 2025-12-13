@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MeetingsOne } from "../../types";
 import { meetingsCreateSchema } from "../../schemas";
-import { CommandSelect } from "@/components/ui/command-select";
+import { CommandSelect } from "@/components/command-select";
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { AgentDialogue } from "@/module/agents/ui/components/agent-dialogue";
 
@@ -141,7 +141,7 @@ export const MeetingForm = ({onSuccess, onCancel, initialValues}: MeetingFormPro
                     </Button>
                     )}
                     <Button type="submit" disabled={isPending} className="ml-2">
-                        {isEdit ? "Save Changes" : "Create Agent"}
+                        {isEdit ? "Save Changes" : "Create Meeting"}
                     </Button>
                 </div>
             </form>
