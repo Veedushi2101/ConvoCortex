@@ -6,6 +6,7 @@ import { AgentDialogue } from "./agent-dialogue"
 import { useAgentsFilters } from "../../hooks/agents-filters"
 import { AgentSearchFilter } from "./agent-search-filter"
 import { AGENT_PAGE } from "@/constants"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 export const AgentListHeader = () =>{
     const [filters, setFilters] = useAgentsFilters();
@@ -31,6 +32,7 @@ export const AgentListHeader = () =>{
             </div>
 
             {/* Search filter */}
+            <ScrollArea>
             <div className="flex items-center gap-x-2 p-1">
                 <AgentSearchFilter/>
                 {ismodifyFilters && (
@@ -39,6 +41,8 @@ export const AgentListHeader = () =>{
                     </Button>
                 )}
             </div>
+            <ScrollBar orientation="horizontal" />
+            </ScrollArea>
         </div>
         </>
     )
