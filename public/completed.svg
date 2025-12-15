@@ -1,0 +1,56 @@
+<svg width="190" height="150" viewBox="0 0 190 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Soft pastel base -->
+  <ellipse cx="95" cy="92" rx="70" ry="40" fill="url(#softGlow)" />
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow)">
+    <rect x="26" y="30" width="138" height="82" rx="14" fill="white"/>
+  </g>
+
+  <!-- Completed icon container -->
+  <rect x="36" y="48" width="32" height="32" rx="9" fill="#E9ECFF"/>
+
+  <!-- Checkmark -->
+  <path
+    d="M45 64 L50 69 L59 58"
+    stroke="#5862FF"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Content lines (strong → soft) -->
+  <rect x="78" y="50" width="72" height="7" rx="3.5" fill="#5862FF"/>
+  <rect x="78" y="68" width="58" height="6" rx="3" fill="#C7CBFF"/>
+  <rect x="78" y="84" width="80" height="6" rx="3" fill="#EEEFFF"/>
+
+  <!-- Floating dots (same palette, positive balance) -->
+  <circle cx="80" cy="114" r="3.5" fill="#5862FF"/>
+  <circle cx="95" cy="122" r="2.5" fill="#FDBA74"/>
+  <circle cx="110" cy="117" r="3" fill="#34D399"/>
+
+  <defs>
+    <!-- Subtle glow -->
+    <radialGradient id="softGlow" cx="0" cy="0" r="1"
+      gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(95 94) scale(70 40)">
+      <stop stop-color="#EDE9FF"/>
+      <stop offset="1" stop-color="white"/>
+    </radialGradient>
+
+    <!-- Soft shadow -->
+    <filter id="cardShadow" x="0" y="0" width="190" height="150"
+      filterUnits="userSpaceOnUse">
+      <feOffset dy="6"/>
+      <feGaussianBlur stdDeviation="10"/>
+      <feColorMatrix
+        values="0 0 0 0 0
+                0 0 0 0 0
+                0 0 0 0 0
+                0 0 0 0.12 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+  </defs>
+
+</svg>
