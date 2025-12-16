@@ -27,7 +27,7 @@ function formatDuration(seconds: number) {
 
 const statusIconsMap = {
   upcoming: ClockArrowUpIcon,
-  active: LoaderIcon,
+  active: VideoIcon,
   completed: CircleCheckIcon,
   processing: LoaderIcon,
   cancelled: CircleXIcon,
