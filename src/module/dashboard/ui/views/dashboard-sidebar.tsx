@@ -47,8 +47,8 @@ export const DashboardSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground">
-        <Link href="/" className="flex items-center gap-2 pt-2 px-2">
-          <Image src="/logo.png" alt="Convo Cortex " width={36} height={36} />
+        <Link href="/" className="flex items-center gap-2 pt-2">
+          <Image src="/logo.svg" alt="Convo Cortex " width={50} height={50} />
           <p className="text-2xl font-semibold">Convo-Cortex</p>
         </Link>
       </SidebarHeader>
