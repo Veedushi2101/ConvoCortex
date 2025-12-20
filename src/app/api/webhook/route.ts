@@ -6,10 +6,10 @@ import { streamChat } from "@/lib/stream-chat";
 import { streamVideoClient } from "@/lib/stream-video";
 import { CallEndedEvent, CallTranscriptionReadyEvent, CallSessionParticipantLeftEvent,CallRecordingReadyEvent,CallSessionStartedEvent, MessageNewEvent } from "@stream-io/node-sdk";
 import { and, eq, not } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import { unknown } from "zod";
+
 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY!});
 function verifySignatureWithSDK(body: string, signature: string) : boolean {
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest){
         return NextResponse.json({error: " Invalid signature"}, {status: 401});
     }
 
-    let payload = unknown;
+    let payload : unknown;
 
     try{
         payload = JSON.parse(body);
