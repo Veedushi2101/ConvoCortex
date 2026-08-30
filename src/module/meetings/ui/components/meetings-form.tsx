@@ -135,12 +135,12 @@ export const MeetingForm = ({onSuccess, onCancel, initialValues}: MeetingFormPro
         
                 <div className="flex justify-between gap-x-2">
                     {onCancel && (
-                    <Button type="button" disabled={isPending} 
+                    <Button type="button" disabled={isPending} className="rounded-xl bg-transparent border border-purple-500/20 text-purple-600 hover:bg-purple-500/10 hover:text-black text-xs font-semibold shadow-md shadow-purple-500/20 transition-all cursor-pointer"
                     variant="destructive" onClick={ () => onCancel()}>
                         Cancel
                     </Button>
                     )}
-                    <Button type="submit" disabled={isPending} className="ml-2">
+                    <Button type="submit" disabled={isPending} className="ml-2 rounded-xl bg-gradient-to-r from-[#7B2CBF] via-[#9D4EDD] to-[#F77F00] hover:opacity-95 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition-all cursor-pointer">
                         {isEdit ? "Save Changes" : "Create Meeting"}
                     </Button>
                 </div>

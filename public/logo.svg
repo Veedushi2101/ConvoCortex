@@ -1,70 +1,102 @@
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none"
-  xmlns="http://www.w3.org/2000/svg">
-
-  <!-- Outer speech bubble -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="bubbleGradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#5862FF"/>
-      <stop offset="100%" stop-color="#8B5CF6"/>
+    <!-- Primary Sunset to Violet Gradient -->
+    <linearGradient id="neonTheme" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C77DFF" />
+      <stop offset="30%" stop-color="#9D4EDD" />
+      <stop offset="65%" stop-color="#7B2CBF" />
+      <stop offset="85%" stop-color="#F77F00" />
+      <stop offset="100%" stop-color="#FFB703" />
     </linearGradient>
 
-    <linearGradient id="brainGradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#C7CBFF"/>
-      <stop offset="100%" stop-color="#EEEFFF"/>
-    </linearGradient>
-
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12"
-        flood-color="#5862FF" flood-opacity="0.25"/>
+    <!-- Ambient Glow Filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
+
+    <!-- Glass Edge Gradient -->
+    <linearGradient id="glassEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05" />
+    </linearGradient>
   </defs>
 
-  <g filter="url(#softShadow)">
-    <!-- Chat bubble -->
-    <path
-      d="M60 50
-         Q60 30 80 30
-         H120
-         Q140 30 140 50
-         V105
-         Q140 125 120 125
-         H90
-         L70 145
-         V125
-         H80
-         Q60 125 60 105
-         Z"
-      fill="url(#bubbleGradient)"
-    />
+  <!-- Obsidian Canvas Base -->
+  <rect width="512" height="512" rx="130" fill="#0A0214" />
+  <rect width="506" height="506" x="3" y="3" rx="127" stroke="url(#neonTheme)" stroke-width="2.5" stroke-opacity="0.3" />
 
-    <!-- Brain shape -->
-    <path
-      d="M95 55
-         C85 55 78 62 78 72
-         C70 74 68 82 72 88
-         C70 96 76 104 86 104
-         C88 110 96 114 104 112
-         C112 114 120 110 122 104
-         C132 104 138 96 136 88
-         C140 82 138 74 130 72
-         C130 62 122 55 112 55
-         C108 52 100 52 95 55
-         Z"
-      fill="url(#brainGradient)"
-    />
+  <!-- Ambient Light Orbs -->
+  <circle cx="200" cy="220" r="130" fill="#7B2CBF" opacity="0.25" filter="url(#softGlow)" />
+  <circle cx="330" cy="300" r="100" fill="#F77F00" opacity="0.2" filter="url(#softGlow)" />
 
-    <!-- Neural nodes -->
-    <circle cx="90" cy="75" r="3" fill="#5862FF"/>
-    <circle cx="105" cy="82" r="3" fill="#5862FF"/>
-    <circle cx="98" cy="92" r="3" fill="#5862FF"/>
-    <circle cx="112" cy="95" r="3" fill="#5862FF"/>
+  <!-- 1. Left Hemisphere (Geometric Neural Waves) -->
+  <path
+    d="M 226 120 
+       C 150 120 100 170 100 246 
+       C 100 295 125 335 160 360 
+       L 135 410 
+       C 133 415 139 420 144 416 
+       L 205 377 
+       C 212 379 219 380 226 380
+       Z"
+    fill="url(#neonTheme)"
+    opacity="0.95"
+  />
 
-    <!-- Neural connections -->
-    <line x1="90" y1="75" x2="105" y2="82"
-      stroke="#5862FF" stroke-width="1.5"/>
-    <line x1="105" y1="82" x2="98" y2="92"
-      stroke="#5862FF" stroke-width="1.5"/>
-    <line x1="98" y1="92" x2="112" y2="95"
-      stroke="#5862FF" stroke-width="1.5"/>
+  <!-- Left Glass Highlight Overlay -->
+  <path
+    d="M 226 120 
+       C 150 120 100 170 100 246 
+       C 100 295 125 335 160 360 
+       L 135 410 
+       C 133 415 139 420 144 416 
+       L 205 377 
+       C 212 379 219 380 226 380
+       Z"
+    fill="url(#glassEdge)"
+  />
+
+  <!-- Cutout Channels inside Left Hemisphere -->
+  <path d="M 180 180 C 140 210 140 280 180 310" stroke="#0A0214" stroke-width="16" stroke-linecap="round" fill="none" />
+  <path d="M 220 215 C 190 235 190 265 220 285" stroke="#0A0214" stroke-width="14" stroke-linecap="round" fill="none" />
+
+  <!-- 2. Right Hemisphere: Dynamic Audio / Convo Synthesis Waves -->
+  <!-- Inner Wave Ring -->
+  <path
+    d="M 265 185 C 305 185 335 215 335 256 C 335 297 305 327 265 327"
+    stroke="url(#neonTheme)"
+    stroke-width="20"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Middle Wave Ring -->
+  <path
+    d="M 275 145 C 345 145 390 195 390 256 C 390 317 345 367 275 367"
+    stroke="url(#neonTheme)"
+    stroke-width="16"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Outer Wave Ring (High-Frequency AI Speech Pulse) -->
+  <path
+    d="M 290 105 C 385 105 440 170 440 256 C 440 342 385 407 290 407"
+    stroke="url(#neonTheme)"
+    stroke-width="12"
+    stroke-linecap="round"
+    opacity="0.6"
+    fill="none"
+  />
+
+  <!-- 3. Central AI Spark Nodes (Interlinking the Two Hemispheres) -->
+  <g filter="url(#softGlow)">
+    <circle cx="245" cy="180" r="10" fill="#FFB703" />
+    <circle cx="245" cy="256" r="14" fill="#FFFFFF" />
+    <circle cx="245" cy="332" r="10" fill="#F77F00" />
+    
+    <!-- Pulse Line Bridge -->
+    <path d="M 245 180 L 245 332" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.8" />
   </g>
 </svg>
