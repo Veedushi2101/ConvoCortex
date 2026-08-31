@@ -1,170 +1,93 @@
-import JSONL from "jsonl-parse-stringify";
+// src/inngest/function.ts
 import { inngest } from "./client";
-import { StreamTranscriptItem } from "@/module/meetings/types";
 import { db } from "@/db";
-import { agents, meetings, user } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
-import { createAgent, openai, TextMessage } from "@inngest/agent-kit";
-import { OpenAI } from "openai";
+import { meetings } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import Groq from "groq-sdk";
 
-// const summarizer = createAgent({
-//   name: "Meeting Summarizer",
-//   system: `You are an expert summarizer. You write readable, concise, simple content. You are given a transcript of a meeting and you need to summarize it.
-
-// Use the following markdown structure for every output:
-
-// ### Overview
-// Provide a detailed, engaging summary of the session's content. Focus on major features, user workflows, and any key takeaways. Write in a narrative style, using full sentences. Highlight unique or powerful aspects of the product, platform, or discussion.
-
-// ### Notes
-// Break down key content into thematic sections with timestamp ranges. Each section should summarize key points, actions, or demos in bullet format.
-
-// Example:
-// #### Section Name
-// - Main point or demo shown here
-// - Another key insight or interaction
-// - Follow-up tool or explanation provided
-
-// #### Next Section
-// - Feature X automatically does Y
-// - Mention of integration with Z`.trim(),
-// model: openai({ model: "gpt-4o", apiKey: process.env.OPENAI_API_KEY})
-// })
-
-
-const openaiClient = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export const meetingsProcessing = inngest.createFunction(
-  {
-    id: "meetings/processing",
-  },
-  {
-    event: "meetings/processing",
-  },
+  { id: "meetings-processing" },
+  { event: "meetings/processing" },
   async ({ event, step }) => {
-        const response = await step.run("fetch-transcript", async() => {
-        return fetch(event.data.transcriptUrl).then((res) => res.text());
-        });
+    const { meetingId, transcriptUrl } = event.data;
 
-        const transcript = await step.run("parse-transcript", async() => {
-        return JSONL.parse<StreamTranscriptItem>(response);
-        });
+    // 1. Fetch & Parse Transcript
+    const transcriptText = await step.run("fetch-transcript", async () => {
+      if (!transcriptUrl || transcriptUrl.trim() === "") {
+        return "No spoken dialog was detected in this brief session.";
+      }
 
-    // const response = await step.fetch(event.data.transcriptUrl);
-    // const transcript = await step.run("parse-transcript", async () => {
-    //   const text = await response.text();
-    //   return JSONL.parse<StreamTranscriptItem>(text);
-    // })
-    // -----------------Replace the above with commented part-----------------------------------
+      try {
+        const res = await fetch(transcriptUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const rawText = await res.text();
 
-    const transcriptWithSpeakers = await step.run("add-speakers", async () => {
-      const speakerIds = [
-        ...new Set(transcript.map((item) => item.speaker_id))
-      ];
-
-      const userSpeakers = await db
-        .select()
-        .from(user)
-        .where(inArray(user.id, speakerIds))
-        .then((users) => users.map((user) => ({
-          ...user,
-        })));
-
-      const agentSpeakers = await db
-        .select()
-        .from(agents)
-        .where(inArray(agents.id, speakerIds))
-        .then((agents) => agents.map((agent) => ({
-          ...agent,
-        })));
-
-      const speakers = [...userSpeakers, ...agentSpeakers];
-
-      return transcript.map((item) => {
-        const speaker = speakers.find(
-          (speaker) => speaker.id === item.speaker_id
-        );
-
-        if (!speaker) {
-          return {
-            ...item,
-            user: {
-              name: "Unknown Speaker"
+        const parsedLines = rawText
+          .split("\n")
+          .filter((line) => line.trim().length > 0)
+          .map((line) => {
+            try {
+              const data = JSON.parse(line);
+              const speaker = data.speaker_id || data.user_id || "Speaker";
+              const text = data.text || data.transcript || "";
+              return text ? `${speaker}: ${text}` : null;
+            } catch {
+              return null;
             }
-          }
-        }
+          })
+          .filter(Boolean)
+          .join("\n");
 
-        return {
-          ...item,
-          user: {
-            name: speaker.name,
-          }
-        }
-
-      })
+        return parsedLines.trim().length > 0
+          ? parsedLines
+          : "No spoken audio was transcribed for this session.";
+      } catch (err: any) {
+        return "No spoken audio was transcribed for this session.";
+      }
     });
 
-    const completion = await openaiClient.chat.completions.create({
-  model: "gpt-4o",
-  messages: [
-    {
-      role: "system",
-      content:
-        `You are an expert summarizer. You write readable, concise, simple content. You are given a transcript of a meeting and you need to summarize it.
+    // 2. Generate Evaluation Summary with Groq
+    const summary = await step.run("generate-summary-with-groq", async () => {
+      const isShortCall =
+        !transcriptText ||
+        transcriptText.includes("No spoken") ||
+        transcriptText.length < 20;
 
-Use the following markdown structure for every output:
+      const userPrompt = isShortCall
+        ? "The interview session concluded very quickly with minimal or no audio detected. Provide a brief note stating the session was too short for a full technical evaluation, along with general recommendations for conducting a complete interview."
+        : `Here is the interview transcript:\n\n${transcriptText}`;
 
-### Overview
-Provide a detailed, engaging summary of the session's content. Focus on major features, user workflows, and any key takeaways. Write in a narrative style, using full sentences. Highlight unique or powerful aspects of the product, platform, or discussion.
+      const completion = await groq.chat.completions.create({
+        model: "openai/gpt-oss-120b",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert AI interview evaluator. Generate a clean, well-structured summary. If sufficient dialog exists, breakdown the candidate's technical proficiency, strengths, and areas for improvement using concise bullet points.",
+          },
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+      });
 
-### Notes
-Break down key content into thematic sections with timestamp ranges. Each section should summarize key points, actions, or demos in bullet format.
+      return completion.choices[0]?.message?.content || "No summary generated.";
+    });
 
-Example:
-#### Section Name
-- Main point or demo shown here
-- Another key insight or interaction
-- Follow-up tool or explanation provided
-
-#### Next Section
-- Feature X automatically does Y
-- Mention of integration with Z`,
-    },
-    {
-      role: "user",
-      content:
-        "Summarize the following meeting transcript:\n" +
-        JSON.stringify(transcriptWithSpeakers),
-    },
-  ],
-});
-
-const summary = completion.choices[0].message.content!;
-
-
-    await step.run("store-summary", async() => {
+    // 3. Save Summary to Database
+    await step.run("save-to-db", async () => {
       await db
-      .update(meetings)
-      .set({
-        summary: summary,
-        status: "completed",
-      })
-      .where(eq(meetings.id, event.data.meetingId))
+        .update(meetings)
+        .set({
+          summary,
+          status: "completed",
+        })
+        .where(eq(meetings.id, meetingId));
     });
 
+    return { success: true, meetingId };
   }
-)
-
-
-// import { inngest } from "./client";
-
-// export const helloWorld = inngest.createFunction(
-//   { id: "hello-world" },
-//   { event: "test/hello.world" },
-//   async ({ event, step }) => { 
-//     await step.sleep("wait-a-moment", "1s");
-//     return { message: `Hello ${event.data.email}!` };
-//   },
-// );
+);

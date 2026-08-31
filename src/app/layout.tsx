@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-// @ts-expect-error CSS imports are handled by the Next.js bundler.
+import "@stream-io/video-react-sdk/dist/css/styles.css";
+import "stream-chat-react/dist/css/v2/index.css";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next";
 
