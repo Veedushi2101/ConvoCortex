@@ -1,4 +1,4 @@
-import { StreamTheme, useCall } from "@stream-io/video-react-sdk";
+import { CallingState, StreamTheme, useCall } from "@stream-io/video-react-sdk";
 import { useState } from "react";
 import { CallLobby } from "./call-lobby";
 import { CallActive } from "./call-active";
@@ -11,17 +11,25 @@ interface Props {
 export const CallUI = ({ meetingName }: Props) => {
   const call = useCall();
   const [show, setShow] = useState<"lobby" | "call" | "ended">("lobby");
-      
-      const handleJoin = async () => {
-        if (!call) return;
-        await call.join();
-        setShow("call");
-      };
+
+  const handleJoin = async () => {
+    if (!call) return;
+    try {
+      await call.join();
+      setShow("call");
+    } catch (error) {
+      console.error("Failed to join call:", error);
+    }
+  };
 
   const handleLeave = async () => {
-    if (!call) return;
-
-    call.endCall();
+    if (call && call.state.callingState !== CallingState.LEFT) {
+      try {
+        await call.leave();
+      } catch (error) {
+        console.warn("Call already left or disconnected:", error);
+      }
+    }
     setShow("ended");
   };
 

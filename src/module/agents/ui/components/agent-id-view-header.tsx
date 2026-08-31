@@ -6,8 +6,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ChevronRightIcon, MoreVerticalIcon, PencilIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -30,33 +34,36 @@ export const AgentIdViewHeader = ({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild className="font-medium text-xl">
-            <Link href={`/agents`}>Agents List</Link>
+              <Link href="/agents">Agents List</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
 
-          <BreadcrumbSeparator className="text-foreground text-xl font-medium [&>svg]: size-4" >
-          <ChevronRightIcon />
+          <BreadcrumbSeparator className="text-foreground text-xl font-medium [&>svg]:size-4">
+            <ChevronRightIcon />
           </BreadcrumbSeparator>
 
           <BreadcrumbItem>
             <BreadcrumbLink asChild className="font-medium text-xl text-foreground">
-            <Link href={`/agents/${agentId}`}>{agentName}</Link>
+              <Link href={`/agents/${agentId}`}>{agentName}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-
         </BreadcrumbList>
       </Breadcrumb>
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-                <MoreVerticalIcon />
-            </Button>
+          <Button variant="ghost" size="icon">
+            <MoreVerticalIcon className="size-4" />
+          </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-md">
-            <DropdownMenuItem onSelect={onEdit}> <PencilIcon className="size-4 text-black"/> Edit Agent</DropdownMenuItem>
-            <DropdownMenuItem onSelect={onRemove} className="text-black"> <TrashIcon className="size-4 text-black"/> Remove Agent</DropdownMenuItem>
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
+            <PencilIcon className="size-4 mr-2" /> Edit Agent
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onRemove} className="cursor-pointer text-destructive focus:text-destructive">
+            <TrashIcon className="size-4 mr-2" /> Remove Agent
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
